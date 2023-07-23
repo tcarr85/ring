@@ -63,19 +63,16 @@ export class WebrtcConnection extends StreamingConnectionBase {
     const liveCallSession = parseLiveCallSession(sessionId)
     super(
       new WebSocket(
-        `wss://${liveCallSession.rms_fqdn}:${liveCallSession.webrtc_port}/`,
-        {
-          headers: {
-            API_VERSION: '3.1',
-            API_TOKEN: sessionId,
-            CLIENT_INFO:
-              'Ring/3.49.0;Platform/Android;OS/7.0;Density/2.0;Device/samsung-SM-T710;Locale/en-US;TimeZone/GMT-07:00',
-          },
-        }
-      ),
-      options
-    )
+       `wss://api.prod.signalling.ring.devices.a2z.com:443/ws?api_version=4.0&auth_type=ring_solutions&client_id=ring_site-${crypto.randomUUID()}&token=${ticket}`, {
+                headers: {
+                    // This must exist or the socket will close immediately but the contents do not seem
+                    // to matter, however, I decided to use the Firefox default user agent since Firefox
+                    // doesn't explicitly support H.265/HEVC
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0'
+                }
+            })
 
+        )
     this.addSubscriptions(
       this.onWsOpen.subscribe(() => {
         logDebug(`WebSocket connected for ${camera.name}`)
